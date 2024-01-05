@@ -1,0 +1,32 @@
+iniciar projeto com typescript
+
+Instalar ts e ts-node-dev em modo de desenvolvimento
+
+pnpm install typescript -D
+pnpm install ts-node-dev -D / npm i tsx -D (usa o esbuild e é mais performático)
+
+configurar script no packege.json para o ts-node-dev monitorar e ignorar node_modules
+"dev": "ts-node-dev --transpile-only --ignore-watch node_modules src/server.ts",
+com tsx:
+"start": "tsx src/server.ts",
+"start:dev": "tsx watch src/server.ts",
+
+
+gerar tsconfig
+npx tsc --init -> arquivo tsconfig
+
+Editar ts config
+ex: "outDir": "./pasta da build" "rootDir": "./src"
+
+Rodar app no ambiente dev com-> npm run dev roda *sempre irá atualizar quando houver mudanças
+
+npx tsc -> gera a build
+
+node dist/server.js -> roda em produção
+
+
+
+-------------------------------------------------
+
+pnpm i vitest -D (performa mais que o jest)
+pnpm i zod (validar dados recebidos em produção)

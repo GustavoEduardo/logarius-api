@@ -1,0 +1,22 @@
+export default interface IUsuario {
+    id_admin: number,
+    id_usuario: number,
+    nome: string,
+    cpf: string,
+    telefone: string,
+    telefone_recado: string,
+    email: string,
+    senha: string,
+    confirmeSenha?: string,
+    nascimento: string,
+    logradouro: string,
+    numero: string,
+    bairro: string,
+    cidade: string,
+    complemento: string,
+    uf: string,
+    cep: string,
+    status: string,
+    criado: string,
+    modificado: string
+  }
