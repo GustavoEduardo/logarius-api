@@ -3,7 +3,7 @@ import UsuarioService from '../services/UsuarioService';
 import ErrorReturn from '../../helpers/serviceDefault/errorReturn';
 import SuccessReturn from '../../helpers/serviceDefault/successReturn';
 
-class UsuarioController{
+class ProdutoController{
 
     async create(req:Request,res:Response){
         try {
@@ -104,4 +104,4 @@ class UsuarioController{
 
 }
 
-export default new UsuarioController();
+export default new ProdutoController();

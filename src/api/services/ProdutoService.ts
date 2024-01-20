@@ -59,7 +59,7 @@ class UsuarioService {
 
     }
 
-    async get(id_admin: any){
+    async getById(id_admin: any){
 
         //validator
 

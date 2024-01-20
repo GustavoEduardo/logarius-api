@@ -1,4 +1,3 @@
-import moment from 'moment';
 import { IDelete, IGet, IInsert, IUpdate } from '../../types/repositories/IBaseCrud';
 import {Connect} from './Connection';
 
@@ -10,7 +9,7 @@ export default class BaseRepositories{
         this.#tabela = tabela
     }
 
-    async validaColuna(tabela: string,coluna: string,msg: string = " não é um filtro válido") {
+    async validaColuna(tabela: string, coluna: string, msg: string = " não é um filtro válido") {
         let infoColumns = await Connect.table(tabela).columnInfo()
        
         if(!infoColumns.hasOwnProperty(String(coluna))){
@@ -22,8 +21,7 @@ export default class BaseRepositories{
         data = {}
     }:IInsert){
 
-        data.criado = moment().format("YYYY-MM-DD HH-mm-ss")
-        data.modificado = moment().format("YYYY-MM-DD HH-mm-ss")
+        // Banco deve ser responsável por criar e preencher created_at e updated_at.
 
         let colunas = Object.entries(data)
         for(let c of colunas){
@@ -100,7 +98,7 @@ export default class BaseRepositories{
         condicao = {},
         raw = ""
     }:IUpdate){
-        data.modificado = moment().format("YYYY-MM-DD HH-mm-ss")
+        // data.modificado = moment().format("YYYY-MM-DD HH-mm-ss") // Banco deve ser responsável por alterar a data.
         let query = Connect.table(this.#tabela).update(data);
         if(condicao && Object.values(condicao).length > 0){            
             condicao = Object.entries(condicao)

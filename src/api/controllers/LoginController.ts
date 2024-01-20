@@ -5,12 +5,6 @@ import SuccessReturn from '../../helpers/serviceDefault/successReturn';
 
 class LoginController{
 
-    async default(req:Request,res:Response){       
-
-        return res.status(200).json({statu: 'true'});
-      
-    }
-
     async login(req:Request,res:Response){
         try {
             let data = req.body;
