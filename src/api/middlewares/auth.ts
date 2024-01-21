@@ -8,11 +8,10 @@ export default (
   next: NextFunction,
 ) => {
     
-    let retorno  = {
+    let retorno = {
         status:"success",
         message:"Ação realizada com sucesso",
-        code: 200,
-        data: {}
+        code: 200
     };
     
     try {

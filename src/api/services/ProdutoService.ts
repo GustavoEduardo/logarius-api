@@ -24,8 +24,7 @@ class ProdutoService {
   async update(data: IProduto, produto_id: string) {
     const produto = await this.select({ produto_id });
 
-    if (produto?.length === 0)
-      throw { message: "Nenhum produto encontrado com esse id!" };
+    if (produto?.length === 0) throw { message: "Nenhum produto encontrado!" };
 
     let retorno = await ProdutoRepositories.update({
       condicao: { produto_id },
@@ -38,8 +37,7 @@ class ProdutoService {
   async delete(produto_id: string) {
     const produto = await this.select({ produto_id });
 
-    if (produto?.length === 0)
-      throw { message: "Nenhum produto encontrado com esse id!" };
+    if (produto?.length === 0) throw { message: "Nenhum produto encontrado!" };
 
     let retorno = await ProdutoRepositories.delete({
       condicao: { produto_id },

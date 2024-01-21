@@ -11,5 +11,3 @@ export interface ISuccessReturn {
   code?: number;
   result?: any;
 }
-
-export type IReturnDefault = ISuccessReturn | IErrorReturn;

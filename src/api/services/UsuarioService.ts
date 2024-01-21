@@ -1,62 +1,139 @@
 import { Config } from "../../config/config";
-import { IProduto } from "../../types/IProduto";
-import bcryptjs from 'bcryptjs';
-import IUsuario from "../../types/IUsuario";
-import ProdutoRepositories from "../respositories/ProdutoRepositories";
+import bcryptjs from "bcryptjs";
+import { IUsuario } from "../../types/IUsuario";
 import UsuarioRepositories from "../respositories/UsuarioRepositories";
+import { validateEmail } from "../../helpers/helpers";
+import { randomUUID } from "crypto";
+import UsuarioPerfilRepositories from "../respositories/UsuarioPerfilRepositories";
 
 class UsuarioService {
-  async create(data: IUsuario){
-    delete data.confirmeSenha
+  async create(data: IUsuario) {
+    // Validações ------------
 
-    if(Config.jwtSalt){
-        var salt: any = bcryptjs.genSaltSync(parseInt(Config.jwtSalt));
-    } 
-    data.senha = bcryptjs.hashSync(data.senha, salt),
-    data.status = "ativo"
-    
-    let retorno = await UsuarioRepositories.insert({
-        data
+    if (!validateEmail(data.email)) throw { message: "Email inválido" };
+
+    let user = await this.select({ email: data.email });
+
+    if (user?.length)
+      throw { message: "Email já está sendo utilidado por outro usuário!" };
+
+    user = await this.select({ login: data.login });
+
+    if (user?.length)
+      throw { message: "Login já está sendo utilidado por outro usuário!" };
+
+    if (data.senha !== data.confirmeSenha)
+      throw { message: "As senhas devem ser iguais!" };
+    delete data.confirmeSenha;
+
+    // ------------
+
+    if (!data.perfis_de_acesso?.length)
+      throw {
+        message: "Informe pelo menos um perfil de acesso para o usuário.",
+      };
+
+    const perfis = data.perfis_de_acesso;
+
+    delete data.perfis_de_acesso;
+
+    if (Config.jwtSalt) {
+      var salt: any = bcryptjs.genSaltSync(parseInt(Config.jwtSalt));
+    }
+    data.senha = bcryptjs.hashSync(data.senha, salt);
+
+    data.usuario_id = randomUUID();
+
+    let result = await UsuarioRepositories.insert({
+      data,
     });
-    
-    return retorno        
 
-}
+    for (let p of perfis) {
+      await UsuarioPerfilRepositories.insert({
+        data: {
+          usuario_id: data.usuario_id,
+          perfil_acesso_id: p,
+        },
+      });
+    }
+
+    return { usuario_id: data.usuario_id, result };
+  }
+
   async select(filtros: any) {
-    let retorno = await ProdutoRepositories.get({
+    let retorno = await UsuarioRepositories.get({
       filtros,
     });
 
     return retorno;
   }
 
-  async update(data: IUsuario, id_admin: any) {
-    //validator
+  async update(data: IUsuario, usuario_id: string) {
+    // Validações ------------
 
-    let retorno = await ProdutoRepositories.update({
-      condicao: { id_admin },
+    const user = await this.select({ usuario_id });
+
+    if (user?.length === 0) throw { message: "Nenhum usuário encontrado!" };
+
+    const perfis = data.perfis_de_acesso;
+    delete data.perfis_de_acesso;
+
+    if (data.senha) {
+      if (data.senha !== data.confirmeSenha)
+        throw { message: "As senhas devem ser iguais!" };
+      delete data.confirmeSenha;
+
+      if (Config.jwtSalt) {
+        var salt: any = bcryptjs.genSaltSync(parseInt(Config.jwtSalt));
+      }
+
+      data.senha = bcryptjs.hashSync(data.senha, salt);
+    }
+
+    if (data.email) {
+      if (!validateEmail(data.email)) throw { message: "Email inválido" };
+
+      const user = await this.select({ email: data.email });
+
+      if (user?.length && user[0].usuario_id !== usuario_id)
+        throw { message: "Email já está sendo utilidado por outro usuário!" };
+    }
+
+    if (data.login) {
+      const user = await this.select({ login: data.login });
+
+      if (user?.length && user[0].usuario_id !== usuario_id)
+        throw { message: "Login já está sendo utilidado por outro usuário!" };
+    }
+
+    // ------------
+
+    let retorno = await UsuarioRepositories.update({
+      condicao: { usuario_id },
       data,
     });
 
+    if (perfis && perfis.length) {
+      for (let p of perfis) {
+        await UsuarioPerfilRepositories.insert({
+          data: {
+            usuario_id: data.usuario_id,
+            perfil_acesso_id: p,
+          },
+        });
+      }
+    }
+
     return retorno;
   }
 
-  async delete(id_admin: any) {
-    //validator
+  async delete(usuario_id: string) {
+    const user = await this.select({ usuario_id });
 
-    let retorno = await ProdutoRepositories.delete({
-      condicao: { id_admin },
-    });
+    if (user?.length === 0) throw { message: "Nenhum usuário encontrado!" };
 
-    return retorno;
-  }
-
-  async get(id_admin: any) {
-    //validator
-
-    let retorno = await ProdutoRepositories.get({
-      // raw: `id_admin = '${id_admin}'`,
-      filtros: { id_admin },
+    let retorno = await UsuarioRepositories.delete({
+      condicao: { usuario_id },
     });
 
     return retorno;
