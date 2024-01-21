@@ -1,107 +1,96 @@
-import {  Request, Response } from 'express';
-import UsuarioService from '../services/UsuarioService';
-import ErrorReturn from '../../helpers/serviceDefault/errorReturn';
-import SuccessReturn from '../../helpers/serviceDefault/successReturn';
+import { Request, Response } from "express";
+import ProdutoService from "../services/ProdutoService";
+import { z } from "zod";
+import { Produto, ProdutoEdit } from "../../types/IProduto";
+import { IErrorReturn, ISuccessReturn } from "../../types/IReturnDefault";
+import { validateInput } from "../../helpers/helpers";
 
-class ProdutoController{
+class ProdutoController {
+  async create(req: Request, res: Response) {
+    try {
+      let data: z.infer<typeof Produto> = req.body;
 
-    async create(req:Request,res:Response){
-        try {
+      validateInput(data, Produto);
 
-            let data = req.body;
-            let result = await UsuarioService.create(data);            
-    
-            let retorno: any = SuccessReturn({
-                result,
-                message: "Usuário criado com sucesso"
-            })
-            
-            res.status(retorno.code).json(retorno);
+      let result = await ProdutoService.create(data);
 
-        }catch ( e: any ) {            
-            let retorno: any = ErrorReturn({
-                message: e.message,
-                result: e.erros
-            })
-            return res.status(retorno.code).json(retorno);
-        }
+      let retorno: ISuccessReturn = {
+        result,
+        message: "Produto criado com sucesso",
+      };
+
+      res.status(200).json(retorno);
+    } catch (e: any) {
+      let retorno: IErrorReturn = {
+        message: e.message,
+        result: e.error,
+      };
+
+      return res.status(400).json(retorno);
     }
+  }
 
-    async select(req:Request,res:Response){
-        try {
-            let filtros = req.query
-            let result = await UsuarioService.select(filtros);
+  async select(req: Request, res: Response) {
+    try {
+      let filtros = req.query;
+      let result = await ProdutoService.select(filtros);
 
-            let retorno: any = SuccessReturn({result})
+      let retorno: ISuccessReturn = { result };
 
-            return res.status(retorno.code).json(retorno);
+      return res.status(200).json(retorno);
+    } catch (e: any) {
+      let retorno: IErrorReturn = {
+        message: e.message,
+        result: e.error,
+      };
 
-        }catch ( e: any ) {
-            
-            let retorno: any = ErrorReturn({
-                message: e.message,
-                result: e.erros
-            })
-
-            return res.status(retorno.code).json(retorno);
-        }
+      return res.status(400).json(retorno);
     }
+  }
 
-    async update(req:Request,res:Response){
-        try {
-            let id = Number(req.params.id)
-            let data = req.body
-            let result = await UsuarioService.update(data,id);    
-            
-            let retorno: any = SuccessReturn({result})
+  async update(req: Request, res: Response) {
+    try {
+      let data = req.body;
 
-            return res.status(retorno.code).json(retorno);
+      validateInput(data, ProdutoEdit);
 
-        }catch ( e: any ) {            
-            let retorno: any = ErrorReturn({
-                message: e.message,
-                result: e.erros
-            })
-            return res.status(retorno.code).json(retorno);
-        }
+      let result = await ProdutoService.update(data, req.params.id);
+
+      let retorno: ISuccessReturn = {
+        result,
+        message: "Produto alterado com sucesso.",
+      };
+
+      return res.status(200).json(retorno);
+    } catch (e: any) {
+      let retorno: IErrorReturn = {
+        message: e.message,
+        result: e.error,
+      };
+
+      return res.status(400).json(retorno);
     }
+  }
 
-    async delete(req:Request,res:Response){
-        try {
-            let id = Number(req.params.id)
-            let result = await UsuarioService.delete(id);    
-            
-            let retorno: any = SuccessReturn({result})
+  async delete(req: Request, res: Response) {
+    try {
+      let result = await ProdutoService.delete(req.params.id);
 
-            return res.status(retorno.code).json(retorno);
+      let retorno: ISuccessReturn = {
+        result,
+        message: "Produto removido com sucesso.",
+      };
 
-        }catch ( e: any ) {            
-            let retorno: any = ErrorReturn({
-                message: e.message,
-                result: e.erros
-            })
-            return res.status(retorno.code).json(retorno);
-        }
+      return res.status(200).json(retorno);
+    } catch (e: any) {
+      let retorno: IErrorReturn = {
+        message: e.message,
+        result: e.error,
+      };
+
+      return res.status(400).json(retorno);
     }
-
-    async get(req:Request,res:Response){
-        try {
-            let id = Number(req.params.id)
-            let result = await UsuarioService.get(id);    
-            
-            let retorno: any = SuccessReturn({result})
-
-            return res.status(retorno.code).json(retorno);
-
-        }catch ( e: any ) {            
-            let retorno: any = ErrorReturn({
-                message: e.message,
-                result: e.erros
-            })
-            return res.status(retorno.code).json(retorno);
-        }
-    }
-
+  }
 }
 
 export default new ProdutoController();

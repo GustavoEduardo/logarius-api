@@ -2,6 +2,7 @@ import { Router } from 'express';
 import Upload from './Upload.routes'
 import LoginRoutes from './Login.routes';
 import UsuarioRoutes from './Usuario.routes';
+import ProdutoRoutes from './Produto.routes';
 import {  Request, Response } from 'express';
 
 const routes = Router();
@@ -16,6 +17,7 @@ routes.get('/', async (req:Request,res:Response)=>{
 routes.use(Upload);
 routes.use(LoginRoutes);
 routes.use(UsuarioRoutes);
+routes.use(ProdutoRoutes);
 
 export default routes;
 

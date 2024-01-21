@@ -5,7 +5,7 @@ import Controller from '../api/controllers/UsuarioController'
 const routes = Router();
 routes.post('/usuario', Controller.create);
 routes.get('/usuario', Controller.select);
-routes.get('/usuario/:id', Controller.getById);
+routes.get('/usuario/:id', Controller.get);
 routes.put('/usuario/:id', Controller.update);
 routes.delete('/usuario/:id', Controller.delete);
 

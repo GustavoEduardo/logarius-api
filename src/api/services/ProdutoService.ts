@@ -1,78 +1,52 @@
-import { Config } from '../../config/config';
-import IUsuario from '../../types/IUsuario';
-import UsuarioRepositories from '../respositories/UsuarioRepositories';
-import bcryptjs from 'bcryptjs';
+import { IProduto } from "../../types/IProduto";
+import ProdutoRepositories from "../respositories/ProdutoRepositories";
+import { randomUUID } from "crypto";
 
+class ProdutoService {
+  async create(data: IProduto) {
+    data.produto_id = randomUUID();
 
-class UsuarioService {
-    
-    async create(data: IUsuario){
-        delete data.confirmeSenha
+    await ProdutoRepositories.insert({
+      data,
+    });
 
-        if(Config.jwtSalt){
-            var salt: any = bcryptjs.genSaltSync(parseInt(Config.jwtSalt));
-        } 
-        data.senha = bcryptjs.hashSync(data.senha, salt),
-        data.status = "ativo"
-        
-        let retorno = await UsuarioRepositories.insert({
-            data
-        });
-        
-        return retorno        
+    return { produto_id: data.produto_id };
+  }
 
-    }
+  async select(filtros: any) {
+    let retorno = await ProdutoRepositories.get({
+      filtros,
+    });
 
-    async select(filtros: any){
+    return retorno;
+  }
 
-        let retorno = await UsuarioRepositories.get({
-            filtros
-        })
+  async update(data: IProduto, produto_id: string) {
+    const produto = await this.select({ produto_id });
 
+    if (produto?.length === 0)
+      throw { message: "Nenhum produto encontrado com esse id!" };
 
-        return retorno        
+    let retorno = await ProdutoRepositories.update({
+      condicao: { produto_id },
+      data,
+    });
 
-    }
+    return retorno;
+  }
 
-    async update(data: IUsuario,id_admin: any){
+  async delete(produto_id: string) {
+    const produto = await this.select({ produto_id });
 
-        //validator
+    if (produto?.length === 0)
+      throw { message: "Nenhum produto encontrado com esse id!" };
 
-        let retorno = await UsuarioRepositories.update({
-            condicao: {id_admin},
-            data
-        });
-        
-        return retorno        
+    let retorno = await ProdutoRepositories.delete({
+      condicao: { produto_id },
+    });
 
-    }
-
-    async delete(id_admin: any){
-
-        //validator
-
-        let retorno = await UsuarioRepositories.delete({
-            condicao: {id_admin}
-        });
-        
-        return retorno        
-
-    }
-
-    async getById(id_admin: any){
-
-        //validator
-
-        let retorno = await UsuarioRepositories.get({
-            // raw: `id_admin = '${id_admin}'`,
-            filtros: {id_admin}
-
-        });
-        
-        return retorno        
-
-    }
-
+    return retorno;
+  }
 }
 
-export default new UsuarioService();
+export default new ProdutoService();

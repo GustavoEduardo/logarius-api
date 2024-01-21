@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { IDelete, IGet, IInsert, IUpdate } from '../../types/repositories/IBaseCrud';
 import {Connect} from './Connection';
 
@@ -98,7 +99,7 @@ export default class BaseRepositories{
         condicao = {},
         raw = ""
     }:IUpdate){
-        // data.modificado = moment().format("YYYY-MM-DD HH-mm-ss") // Banco deve ser responsável por alterar a data.
+        data.updated_at = moment().format("YYYY-MM-DD HH-mm-ss");
         let query = Connect.table(this.#tabela).update(data);
         if(condicao && Object.values(condicao).length > 0){            
             condicao = Object.entries(condicao)
