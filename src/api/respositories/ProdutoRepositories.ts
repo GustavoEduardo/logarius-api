@@ -1,6 +1,8 @@
 import axios, { AxiosInstance } from "axios";
 import BaseRepositories from "./BaseRepositories";
 import { responseInterceptor } from "../../helpers/axios-interceptors";
+import { Connect } from "./Connection";
+import { IProdutosToAdd } from "../../types/IVenda";
 
 class ProdutoRepositorie extends BaseRepositories {
   private api: AxiosInstance;
@@ -16,6 +18,14 @@ class ProdutoRepositorie extends BaseRepositories {
     });
     responseInterceptor(this.api);
   }
+
+  async selectInIds(produtosIds: string[]){
+    return await Connect('produto')
+    .whereIn('produto_id', produtosIds.map(produto_id => produto_id))
+    .select('produto_id', 'quantidade_estoque');
+  }
+
+
 }
 
 export default new ProdutoRepositorie();

@@ -16,7 +16,7 @@ class VendaController {
 
       let retorno: ISuccessReturn = {
         result,
-        message: "Venda criado com sucesso",
+        message: "Venda realizada com sucesso",
       };
 
       res.status(200).json(retorno);
@@ -30,6 +30,7 @@ class VendaController {
     }
   }
 
+  // add páginação e criar metodo em rep. com filtro de datas
   async select(req: Request, res: Response) {
     try {
       let filtros = req.query;
@@ -48,6 +49,7 @@ class VendaController {
     }
   }
 
+  // implementar
   async update(req: Request, res: Response) {
     try {
       let data = req.body;
@@ -72,13 +74,14 @@ class VendaController {
     }
   }
 
+  // mudar status e voltar estoques
   async delete(req: Request, res: Response) {
     try {
       let result = await VendaService.delete(req.params.id);
 
       let retorno: ISuccessReturn = {
         result,
-        message: "Venda removido com sucesso.",
+        message: "Venda removida com sucesso.",
       };
 
       return res.status(200).json(retorno);

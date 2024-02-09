@@ -19,20 +19,20 @@ export const Venda = z.object({
   metodo_pagamento_id: z.string(),
   valor: z.number(),
   valor_desconto: z.number(),
-  valor_final: z.number(),
-  status: z.string(),
-  status_pagamento: z.string(),
-  endereco_entrega: z.string(),
-  created_at: z.string(),
+  valor_final: z.number().optional(),
+  status: z.string().optional(),
+  status_pagamento: z.string().optional(),
+  endereco_entrega: z.string().optional().nullable(),
+  created_at: z.string().optional(),
   produtos: z.array(ProdutosToAdd).optional()
 });
 
 export const VendaEdit = z.object({
-  cliente_id: z.string(),
-  metodo_pagamento_id: z.string(),
-  valor: z.number(),
-  valor_desconto: z.number(),
-  valor_final: z.number(),
-  endereco_entrega: z.string(),
+  cliente_id: z.string().optional(),
+  metodo_pagamento_id: z.string().optional(),
+  valor: z.number().optional(),
+  valor_desconto: z.number().optional(),
+  valor_final: z.number().optional(),
+  endereco_entrega: z.string().optional(),
   produtos: z.array(ProdutosToAdd).optional()
 });
