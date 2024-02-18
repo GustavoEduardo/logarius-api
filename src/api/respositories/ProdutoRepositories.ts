@@ -22,7 +22,7 @@ class ProdutoRepositorie extends BaseRepositories {
   async selectInIds(produtosIds: string[]){
     return await Connect('produto')
     .whereIn('produto_id', produtosIds.map(produto_id => produto_id))
-    .select('produto_id', 'quantidade_estoque');
+    .select('produto_id', 'quantidade_estoque', 'nome');
   }
 
 

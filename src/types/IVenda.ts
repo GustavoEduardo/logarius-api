@@ -34,5 +34,7 @@ export const VendaEdit = z.object({
   valor_desconto: z.number().optional(),
   valor_final: z.number().optional(),
   endereco_entrega: z.string().optional(),
+  status: z.string().optional(),
+  status_pagamento: z.string().optional(),
   produtos: z.array(ProdutosToAdd).optional()
 });

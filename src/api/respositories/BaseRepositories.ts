@@ -97,9 +97,13 @@ export default class BaseRepositories{
     async update({
         data={},
         condicao = {},
-        raw = ""
+        raw = "",
+        set_data = true
     }:IUpdate){
-        data.updated_at = moment().format("YYYY-MM-DD HH-mm-ss");
+        if (set_data) {
+            data.updated_at = moment().format("YYYY-MM-DD HH-mm-ss");
+        }
+       
         let query = Connect.table(this.#tabela).update(data);
         if(condicao && Object.values(condicao).length > 0){            
             condicao = Object.entries(condicao)

@@ -49,7 +49,6 @@ class VendaController {
     }
   }
 
-  // implementar
   async update(req: Request, res: Response) {
     try {
       let data = req.body;
@@ -60,7 +59,7 @@ class VendaController {
 
       let retorno: ISuccessReturn = {
         result,
-        message: "Venda alterado com sucesso.",
+        message: "Venda alterada com sucesso.",
       };
 
       return res.status(200).json(retorno);
