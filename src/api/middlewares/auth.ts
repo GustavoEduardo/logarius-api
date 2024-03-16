@@ -29,14 +29,14 @@ export default (
 
         //validar schema do authorization "Bearer"
         const [scheme, token] = parts;
-        if( !/^Bearer$/i.test(scheme) ) throw 'token invalido'
+        if( !/^Bearer$/i.test(scheme) ) throw 'Sessão expirada'
 
-        if (!token) throw 'Token Invalido';
+        if (!token) throw 'Sessão expirada';
 
 
         if( Config.jwtSecret){
           jwt.verify(token, Config.jwtSecret, function(err: any, decoded: any) {
-            if (err) throw 'Token Invalido';          
+            if (err) throw 'Sessão expirada';          
             
             if(decoded && decoded.id_usuario) req.id_usuario = decoded.id_usuario;
            
@@ -45,10 +45,10 @@ export default (
 
     }catch (e: any) {
         retorno.message = e;
-        retorno.code = 200;
+        retorno.code = 400;
         retorno.status = "error";
 
-        return res.status(200).json(retorno);
+        return res.status(400).json(retorno);
     }
     return next();
 };
