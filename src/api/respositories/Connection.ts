@@ -1,5 +1,7 @@
 import {Config} from '../../config/config';
 import knex from 'knex'
+import { attachPaginate } from 'knex-paginate';
+attachPaginate();
 
 let Connect = knex({
     client: 'mysql2',

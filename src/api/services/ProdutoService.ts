@@ -14,9 +14,7 @@ class ProdutoService {
   }
 
   async select(filtros: any) {
-    let retorno = await ProdutoRepositories.get({
-      filtros,
-    });
+    let retorno = await ProdutoRepositories.select(filtros);
 
     return retorno;
   }
