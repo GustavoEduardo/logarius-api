@@ -6,6 +6,12 @@ class ProdutoService {
   async create(data: IProduto) {
     data.produto_id = randomUUID();
 
+    let existe: any = await ProdutoRepositories.get({filtros: {nome: data.nome}});
+
+    if (existe[0]) {
+        throw {message: 'Já existe um produto com esse nome'};
+    }
+
     await ProdutoRepositories.insert({
       data,
     });
@@ -20,7 +26,7 @@ class ProdutoService {
   }
 
   async update(data: IProduto, produto_id: string) {
-    const produto = await this.select({ produto_id });
+    const produto: any = await this.select({ produto_id });
 
     if (produto?.length === 0) throw { message: "Nenhum produto encontrado!" };
 
@@ -33,7 +39,7 @@ class ProdutoService {
   }
 
   async delete(produto_id: string) {
-    const produto = await this.select({ produto_id });
+    const produto: any = await this.select({ produto_id });
 
     if (produto?.length === 0) throw { message: "Nenhum produto encontrado!" };
 

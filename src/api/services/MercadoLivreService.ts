@@ -1,5 +1,5 @@
 import { Config } from '../../config/config';
-import IUsuario from '../../types/IUsuario';
+import { IUsuario } from '../../types/IUsuario';
 import MercadoLivreRepositories from '../respositories/MercadoLivreRepositories';
 import bcryptjs from 'bcryptjs';
 

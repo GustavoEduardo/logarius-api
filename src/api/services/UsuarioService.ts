@@ -12,7 +12,7 @@ class UsuarioService {
 
     if (!validateEmail(data.email)) throw { message: "Email inválido" };
 
-    let user = await this.select({ email: data.email });
+    let user: any = await this.select({ email: data.email });
 
     if (user?.length)
       throw { message: "Email já está sendo utilidado por outro usuário!" };
@@ -71,7 +71,7 @@ class UsuarioService {
   async update(data: IUsuario, usuario_id: string) {
     // Validações ------------
 
-    const user = await this.select({ usuario_id });
+    const user: any = await this.select({ usuario_id });
 
     if (user?.length === 0) throw { message: "Nenhum usuário encontrado!" };
 
@@ -93,14 +93,14 @@ class UsuarioService {
     if (data.email) {
       if (!validateEmail(data.email)) throw { message: "Email inválido" };
 
-      const user = await this.select({ email: data.email });
+      const user: any = await this.select({ email: data.email });
 
       if (user?.length && user[0].usuario_id !== usuario_id)
         throw { message: "Email já está sendo utilidado por outro usuário!" };
     }
 
     if (data.login) {
-      const user = await this.select({ login: data.login });
+      const user: any = await this.select({ login: data.login });
 
       if (user?.length && user[0].usuario_id !== usuario_id)
         throw { message: "Login já está sendo utilidado por outro usuário!" };
@@ -128,7 +128,7 @@ class UsuarioService {
   }
 
   async delete(usuario_id: string) {
-    const user = await this.select({ usuario_id });
+    const user: any = await this.select({ usuario_id });
 
     if (user?.length === 0) throw { message: "Nenhum usuário encontrado!" };
 

@@ -24,7 +24,8 @@ export const Venda = z.object({
   status_pagamento: z.string().optional(),
   endereco_entrega: z.string().optional().nullable(),
   created_at: z.string().optional(),
-  produtos: z.array(ProdutosToAdd).optional()
+  produtos: z.array(ProdutosToAdd).optional(),
+  origem: z.string().optional(),
 });
 
 export const VendaEdit = z.object({

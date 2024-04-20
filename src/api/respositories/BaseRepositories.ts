@@ -42,7 +42,7 @@ export default class BaseRepositories {
     try {
       var retorno = await Connect.table(this.#tabela).insert(data);
     } catch (e: any) {
-      return e.message;
+      throw {message: e.message};
     }
 
     return retorno[0];
@@ -109,7 +109,7 @@ export default class BaseRepositories {
           query.where(filtro);
         }
       } catch (e: any) {
-        return e.message;
+        throw {message: e.message};
       }
     }
 
@@ -172,7 +172,7 @@ export default class BaseRepositories {
           query.where(filtro);
         }
       } catch (e: any) {
-        return e.message;
+        throw {message: e.message};
       }
     } else {
       throw { message: "Informe a condição" };
@@ -198,7 +198,7 @@ export default class BaseRepositories {
           query.where(filtro);
         }
       } catch (e: any) {
-        return e.message;
+        throw {message: e.message};
       }
     } else {
       throw { message: "Informe a condição" };

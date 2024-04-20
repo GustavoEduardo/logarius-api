@@ -6,6 +6,7 @@ import UsuarioRoutes from "./Usuario.routes";
 import ProdutoRoutes from "./Produto.routes";
 import VendaRoutes from "./Venda.routes";
 import MetodoPagamentoRoutes from "./MetodoPagamento.routes";
+import ComandaRoutes from "./Comanda.routes";
 
 const routes = Router();
 
@@ -19,5 +20,6 @@ routes.use(UsuarioRoutes);
 routes.use(ProdutoRoutes);
 routes.use(VendaRoutes);
 routes.use(MetodoPagamentoRoutes);
+routes.use(ComandaRoutes);
 
 export default routes;

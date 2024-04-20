@@ -1,3 +1,4 @@
+import { IProduto } from "../../types/IProduto";
 import { IProdutosToAdd, IVenda } from "../../types/IVenda";
 import BaseRepositories from "../respositories/BaseRepositories";
 import { Connect } from "../respositories/Connection";
@@ -7,7 +8,7 @@ import { randomUUID } from "crypto";
 
 class VendaService {
   async create(data: IVenda) {
-    if (!data.produtos?.length) {
+    if (!data.produtos?.length && data.origem !== "comanda") {
       throw { message: "A venda precisa ter pelo menos um item!" };
     }
 
@@ -15,12 +16,12 @@ class VendaService {
 
     data.venda_id = randomUUID();
 
-    data.status_pagamento = "efetuado"; // Implementar integração cartão e pix.
-    data.status = "pendente"; // status até concluir atualização de estoques e relacionamento com produtos.
+    data.status_pagamento = data.status_pagamento || "efetuado"; // Implementar integração cartão e pix.
+    data.status = "pendente"; // Até concluir atualização de estoques e relacionamento com produtos.
 
     data.endereco_entrega = data.endereco_entrega || null;
 
-    const produtos: IProdutosToAdd[] = data.produtos;
+    const produtos: IProdutosToAdd[] | [] = data.produtos || [];
 
     delete data.produtos;
 
@@ -43,18 +44,25 @@ class VendaService {
     // ajustar estoques
     this.atualizarEstoque(produtos);
 
-    await VendaRepositories.update({
-      data: { status: "entregue" },
-      condicao: { venda_id: data.venda_id },
-    });
-    // No momento sistema apenas para estabelecimento físico com venda direta, por isso status = entregue.
+    if (data.origem !== 'comanda') {
+      await VendaRepositories.update({
+        data: { status: data.status || "confirmada" },
+        condicao: { venda_id: data.venda_id },
+      });
+    }
+    // Até a integração do pegamento ficar pronta, status = confirmada.
+    // Após só mudar quando pagamento for aprovado.
 
-    return { Venda_id: data.venda_id };
+    return { venda_id: data.venda_id };
   }
 
   async select(filtros: any) {
-    let retorno = await VendaRepositories.get({
-      filtros,
+    let retorno = await VendaRepositories.select(filtros);
+
+    retorno.data.forEach(c => {
+      retorno.data.forEach(c => {
+            c.produtos = c.produtos[0] ? c.produtos : [];
+      });
     });
 
     return retorno;
@@ -63,13 +71,17 @@ class VendaService {
   async update(data: IVenda, venda_id: string) {
     const venda = await this.select({ venda_id });
 
-    if (venda?.length === 0 || ["removida"].includes(venda[0].status))
+    if (venda.data.length && ["cancelada"].includes(venda.data[0].status)) {
+      throw { message: "Não é possível editar uma venda cancelada!" };
+    }
+
+    if (venda.data?.length === 0)
       throw { message: "Nenhuma venda encontrada!" };
 
     if (data.valor) {
       data.valor_final = data.valor_desconto?.toString()
         ? (data.valor_final = data.valor - data.valor_desconto)
-        : data.valor - (venda[0].valor_desconto || 0);
+        : data.valor - (venda.data[0].valor_desconto || 0);
     }
 
     let produtosDaVenda: IProdutosToAdd[] | null = null;
@@ -98,7 +110,7 @@ class VendaService {
     if (produtosDaVenda) {
       const vp = new BaseRepositories("venda_produto");
 
-      let qtd_anterior = await vp.get({ filtros: { venda_id } });
+      let qtd_anterior: any = await vp.get({ filtros: { venda_id } });
 
       const estoque_atual = await ProdutoRepositories.selectInIds([
         ...produtosDaVenda.map((p) => p.produto_id),
@@ -118,18 +130,18 @@ class VendaService {
         if (qtdA) {
           dif = qtdA.quantidade - p.quantidade;
 
-           // valida se exites estoque suficiente
-          if (qtdA.quantidade < p.quantidade && (ea.quantidade_estoque < (p.quantidade - qtdA.quantidade))) {
+          // valida se exites estoque suficiente
+          if (
+            qtdA.quantidade < p.quantidade &&
+            ea.quantidade_estoque < p.quantidade - qtdA.quantidade
+          ) {
             throw { message: `Estoque insuficinte para o item ${ea.nome}.` };
           }
-
         } else if (p.quantidade) {
-
-            // valida se exites estoque suficiente
-            if (p.quantidade > ea.quantidade_estoque) {
-              throw { message: `Estoque insuficinte para o item ${ea.nome}.` };
-            }
-
+          // valida se exites estoque suficiente
+          if (p.quantidade > ea.quantidade_estoque) {
+            throw { message: `Estoque insuficinte para o item ${ea.nome}.` };
+          }
 
           toAddVPLote.push({
             venda_id,
@@ -170,15 +182,13 @@ class VendaService {
             nova_qtd = ea.quantidade_estoque - toSub;
           }
 
-          if (pa.quantidade !== pv.quantidade){
+          if (pa.quantidade !== pv.quantidade) {
             toUpdateEstoque.push({
               produto_id: ea.produto_id,
               valor: ea.valor,
               quantidade: nova_qtd,
             });
-
           }
-
         } else {
           toAddEstoque.push({
             produto_id: ea.produto_id,
@@ -230,14 +240,43 @@ class VendaService {
     return retorno;
   }
 
-  async delete(venda_id: string) {
-    const venda = await this.select({ venda_id });
+  async cancelar(venda_id: string) {
+    const venda: any = await this.select({ venda_id });
 
-    if (venda?.length === 0) throw { message: "Nenhuma venda encontrada!" };
+    if (venda.data?.length === 0)
+      throw { message: "Nenhuma venda encontrada!" };
+
+    // voltar estoques
+    let toUpdateEstoque: IProdutosToAdd[] = [];
+
+    const estoque_atual = await ProdutoRepositories.selectInIds([
+      ...venda.data[0].produtos.map((p: IProduto) => p.produto_id),
+    ]);
+
+
+    estoque_atual.forEach( p => {
+
+      let qtdNaVenda = venda.data[0].produtos.find( (pv: IProduto) => pv.produto_id === p.produto_id);
+
+      let nova_qtd = p.quantidade_estoque + qtdNaVenda.quantidade;
+
+      toUpdateEstoque.push({
+        produto_id: p.produto_id,
+        valor: p.valor,
+        quantidade: nova_qtd
+      });
+
+    });
+
+    this.atualizarEstoque(toUpdateEstoque ,true);
+
+
+    // deletar da tabela venda_produto. não para manter o histórico!
+    // await Connect('venda_produto').delete().where('venda_id', venda_id);
 
     let retorno = await VendaRepositories.update({
       condicao: { venda_id },
-      data: { status: "removida" },
+      data: { status: "cancelada" },
     });
 
     return retorno;
@@ -259,7 +298,7 @@ class VendaService {
 
     if (update) {
       atualizacoesEmLote = produtosDaVenda.map((pv) => {
-          return { produto_id: pv.produto_id, novaQuantidade: pv.quantidade };
+        return { produto_id: pv.produto_id, novaQuantidade: pv.quantidade };
       });
     } else {
       atualizacoesEmLote = produtosDaVenda.map((pv) => {

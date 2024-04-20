@@ -1,22 +1,22 @@
 import { Request, Response } from "express";
-import VendaService from "../services/VendaService";
+import ComandaService from "../services/ComandaService";
 import { z } from "zod";
-import { Venda, VendaEdit } from "../../types/IVenda";
+import { Comanda, ComandaEdit } from "../../types/IComanda";
 import { IErrorReturn, ISuccessReturn } from "../../types/IReturnDefault";
 import { validateInput } from "../../helpers/helpers";
 
-class VendaController {
+class ComandaController {
   async create(req: Request, res: Response) {
     try {
-      let data: z.infer<typeof Venda> = req.body;
+      let data: z.infer<typeof Comanda> = req.body;
 
-      validateInput(data, Venda);
+      validateInput(data, Comanda);
 
-      let result = await VendaService.create(data);
+      let result = await ComandaService.create(data);
 
       let retorno: ISuccessReturn = {
         result,
-        message: "Venda realizada com sucesso",
+        message: "Comanda criada com sucesso",
       };
 
       res.status(200).json(retorno);
@@ -34,7 +34,7 @@ class VendaController {
   async select(req: Request, res: Response) {
     try {
       let filtros = req.query;
-      let result = await VendaService.select(filtros);
+      let result = await ComandaService.select(filtros);
 
       let retorno: ISuccessReturn = { result };
 
@@ -53,13 +53,13 @@ class VendaController {
     try {
       let data = req.body;
 
-      validateInput(data, VendaEdit);
+      validateInput(data, ComandaEdit);
 
-      let result = await VendaService.update(data, req.params.id);
+      let result = await ComandaService.update(data, req.params.id);
 
       let retorno: ISuccessReturn = {
         result,
-        message: "Venda alterada com sucesso.",
+        message: "Comanda alterada com sucesso.",
       };
 
       return res.status(200).json(retorno);
@@ -75,11 +75,11 @@ class VendaController {
 
   async delete(req: Request, res: Response) {
     try {
-      let result = await VendaService.cancelar(req.params.id);
+      let result = await ComandaService.cancelar(req.params.id);
 
       let retorno: ISuccessReturn = {
         result,
-        message: "Venda cancelada com sucesso.",
+        message: "Comanda removida com sucesso.",
       };
 
       return res.status(200).json(retorno);
@@ -94,4 +94,4 @@ class VendaController {
   }
 }
 
-export default new VendaController();
+export default new ComandaController();

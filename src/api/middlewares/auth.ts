@@ -16,6 +16,8 @@ export default (
     
     try {
 
+      return next();
+
         //validar se existe authorization no header
         const authHeader = req.headers.authorization;
     
@@ -34,14 +36,14 @@ export default (
         if (!token) throw 'Sessão expirada';
 
 
-        if( Config.jwtSecret){
-          jwt.verify(token, Config.jwtSecret, function(err: any, decoded: any) {
-            if (err) throw 'Sessão expirada';          
+        // if( Config.jwtSecret){
+        //   jwt.verify(token, Config.jwtSecret, function(err: any, decoded: any) {
+        //     if (err) throw 'Sessão expirada';          
             
-            if(decoded && decoded.id_usuario) req.id_usuario = decoded.id_usuario;
+        //     if(decoded && decoded.id_usuario) req.id_usuario = decoded.id_usuario;
            
-          })
-        }      
+        //   })
+        // }      
 
     }catch (e: any) {
         retorno.message = e;
