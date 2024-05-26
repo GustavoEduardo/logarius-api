@@ -253,7 +253,6 @@ class VendaService {
       ...venda.data[0].produtos.map((p: IProduto) => p.produto_id),
     ]);
 
-
     estoque_atual.forEach( p => {
 
       let qtdNaVenda = venda.data[0].produtos.find( (pv: IProduto) => pv.produto_id === p.produto_id);
@@ -270,8 +269,7 @@ class VendaService {
 
     this.atualizarEstoque(toUpdateEstoque ,true);
 
-
-    // deletar da tabela venda_produto. não para manter o histórico!
+    // não deletar da tabela venda_produto para manter o histórico!
     // await Connect('venda_produto').delete().where('venda_id', venda_id);
 
     let retorno = await VendaRepositories.update({

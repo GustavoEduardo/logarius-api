@@ -19,10 +19,16 @@ class ComandaRepositories extends BaseRepositories {
       .join("venda AS v", "c.venda_id", "v.venda_id")
       .leftJoin("venda_produto AS vp", "v.venda_id", "vp.venda_id")
       .leftJoin("produto AS p", "vp.produto_id", "p.produto_id")
-      .groupBy("c.comanda_id");
+      .groupBy("c.comanda_id")
+      .orderBy('status_comanda','asc');
 
     if (filtros.pesquisa) {
       query.whereILike(`c.titulo`, `%${filtros.pesquisa}%`);
+    }
+
+    if (filtros.status_comanda) {
+      query.whereIn('c.status_comanda',filtros.status_comanda.split(','))
+      delete filtros.status_comanda;
     }
 
     query = whereQuery(query, filtros, "c");

@@ -63,7 +63,8 @@ class ComandaService {
       titulo: data.titulo,
       status_comanda: data.status_comanda,
       venda_id: data.venda_id,
-      valor_pago: data.valor_pago
+      valor_pago: data.valor_pago,
+      observacao: data.observacao
     };
 
     if (data.status_comanda){
@@ -72,10 +73,9 @@ class ComandaService {
 
     if (!data.apenasComanda) {
       // Para casos onde a atualização da venda não é necessária.
-
       
-      if (data.status_comanda = 'Fechada') {
-        data.status_pagamento = 'efetuado';
+      if (data.status_comanda === 'Fechada') {
+        data.status_pagamento === 'efetuado';
         data.status = 'confirmada';
       }
 
@@ -84,6 +84,7 @@ class ComandaService {
       delete data.created_at;
       delete data.status_comanda;
       delete data.valor_pago;
+      delete data.observacao;
 
       await VendaService.update(data, data.venda_id);
     }
@@ -102,11 +103,11 @@ class ComandaService {
     if (comanda?.data.length === 0)
       throw { message: "Nenhuma comanda encontrada!" };
 
-    await VendaService.cancelar(comanda.data.venda_id);
+    await VendaService.cancelar(comanda.data[0].venda_id);
 
     let retorno = await ComandaRepositories.update({
       condicao: { comanda_id },
-      data: { status: "cancelada" },
+      data: { status_comanda: "cancelada" },
     });
 
     return retorno;

@@ -79,7 +79,7 @@ class ComandaController {
 
       let retorno: ISuccessReturn = {
         result,
-        message: "Comanda removida com sucesso.",
+        message: "Comanda cancelada com sucesso.",
       };
 
       return res.status(200).json(retorno);
